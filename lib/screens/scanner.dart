@@ -1,7 +1,7 @@
-import 'package:attendance_app/providers/qr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:attendance_app/providers/qr.dart';
 
 class QRScanner extends ConsumerWidget {
   final MobileScannerController cameraController = MobileScannerController();
@@ -12,7 +12,7 @@ class QRScanner extends ConsumerWidget {
       WidgetRef ref) async {
     for (final barcode in barcodeCapture.barcodes) {
       final String? code = barcode.rawValue;
-      print('data hai $code');
+      print('Scanned code: $code');
 
       if (code != null && !ref.read(qrScanProvider).isProcessing) {
         ref.read(qrScanProvider.notifier).scanQRCode(code);
@@ -28,6 +28,9 @@ class QRScanner extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final scanState = ref.watch(qrScanProvider);
+
+    final fetchedPerson =
+        scanState.persons.isNotEmpty ? scanState.persons.last : null;
 
     return Scaffold(
       appBar: AppBar(
@@ -50,29 +53,27 @@ class QRScanner extends ConsumerWidget {
       body: Column(
         children: [
           if (scanState.isProcessing) LinearProgressIndicator(),
-          Expanded(
+          Container(
+            height: 300,
+            width: double.infinity,
             child: MobileScanner(
               controller: cameraController,
               onDetect: (barcodeCapture) =>
                   _onDetect(barcodeCapture, context, ref),
             ),
           ),
-          if (scanState.personDetails != null)
+          if (fetchedPerson != null) ...[
             Padding(
               padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Person Details:',
-                      style:
-                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                  Text('ID: ${scanState.personDetails!['id']}'),
-                  Text('Name: ${scanState.personDetails!['name']}'),
-                  Text('Email: ${scanState.personDetails!['email']}'),
-                  Text('Status: ${scanState.personDetails!['status']}'),
-                ],
-              ),
+              child: Text('Student Details:',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
             ),
+            ListTile(
+              title: Text('Name: ${fetchedPerson.name}'),
+              subtitle: Text(
+                  'Student Number: ${fetchedPerson.studentNumber}\nEmail: ${fetchedPerson.email}\nBranch: ${fetchedPerson.branch}'),
+            ),
+          ],
           if (scanState.errorMessage != null)
             Padding(
               padding: const EdgeInsets.all(16.0),
