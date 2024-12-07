@@ -1,6 +1,6 @@
 import 'package:attendance_app/screens/registered.dart';
 import 'package:attendance_app/screens/scanner.dart';
-import 'package:attendance_app/screens/search.dart';
+import 'package:attendance_app/screens/present.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -14,7 +14,7 @@ class Bottomnavbar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final List<Widget> screens = [
-      Search(),
+      PersonListScreen(),
       QRScanner(),
       RegisteredPersonsScreen(),
     ];
