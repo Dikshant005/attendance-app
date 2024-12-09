@@ -13,8 +13,8 @@ class Person {
 
   factory Person.fromJson(Map<String, dynamic> json) {
     return Person(
-      name: json['name'],
-      studentNumber: json['student_number'],
+      name: json['fullname'],
+      studentNumber: json['student_no'],
       email: json['email'],
       branch: json['branch'],
     );

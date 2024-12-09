@@ -38,13 +38,14 @@ class PersonNotifier extends StateNotifier<PersonState> {
   Future<void> fetchPersons() async {
     state = state.copyWith(isLoading: true);
     try {
-      final response = await http
-          .get(Uri.parse('https://your-api-endpoint.com/registered-persons'));
+      final response = await http.get(
+          Uri.parse('http://brl_registration_12.sugandhi.tech/member'));
 
       if (response.statusCode == 200) {
-        final List<dynamic> jsonData = json.decode(response.body);
-        final List<Person> persons =
-            jsonData.map((data) => Person.fromJson(data)).toList();
+        final Map<String, dynamic> jsonData = json.decode(response.body);
+        final List<Person> persons = (jsonData['members'] as List)
+            .map((data) => Person.fromJson(data))
+            .toList();
 
         state = state.copyWith(persons: persons, isLoading: false);
       } else {
