@@ -1,7 +1,7 @@
+import 'package:attendance_app/providers/qr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:attendance_app/providers/qr.dart';
 
 class QRScanner extends ConsumerWidget {
   final MobileScannerController cameraController = MobileScannerController();
@@ -49,8 +49,7 @@ class QRScanner extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final scanState = ref.watch(qrScanProvider);
-    final qrData =
-        scanState.errorMessage != null ? null : scanState.lastScannedData;
+    final studentDetails = scanState.lastScannedData;
 
     return Scaffold(
       appBar: AppBar(
@@ -84,26 +83,18 @@ class QRScanner extends ConsumerWidget {
           ),
           AnimatedContainer(
             duration: Duration(milliseconds: 300),
-            height: qrData != null ? 150 : 0,
+            height: studentDetails != null ? 150 : 0,
             curve: Curves.easeInOut,
-            child: qrData != null
+            child: studentDetails != null
                 ? Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
                       children: [
                         Text(
-                          'Student Details:',
+                          studentDetails['message'] ?? 'No message available',
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        ListTile(
-                          title: Text('Name: ${qrData['Name']}'),
-                          subtitle: Text(
-                            'Student Number: ${qrData['Student No']}\n'
-                            'Email: ${qrData['Email']}',
                           ),
                         ),
                       ],

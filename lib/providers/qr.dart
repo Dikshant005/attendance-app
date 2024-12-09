@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
@@ -41,8 +43,13 @@ class QRScanNotifier extends StateNotifier<QRScanState> {
       );
 
       if (response.statusCode == 200) {
+        final responseBody = jsonDecode(response.body);
+
+        final msg = responseBody['msg'] ?? 'Attendance marking failed';
+
         state = state.copyWith(
           isProcessing: false,
+          lastScannedData: {'message': msg},
         );
       } else {
         state = state.copyWith(
