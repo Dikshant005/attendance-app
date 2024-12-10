@@ -22,7 +22,7 @@ class QRScanner extends ConsumerWidget {
         }
 
         await cameraController.stop();
-        await Future.delayed(Duration(seconds: 2));
+        await Future.delayed(const Duration(seconds: 2));
         cameraController.start();
         break;
       }
@@ -53,16 +53,16 @@ class QRScanner extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('QR Scanner'),
+        title: const Text('QR Scanner'),
         actions: [
           IconButton(
-            icon: Icon(Icons.flash_on),
+            icon: const Icon(Icons.flash_on),
             onPressed: () {
               cameraController.toggleTorch();
             },
           ),
           IconButton(
-            icon: Icon(Icons.cameraswitch),
+            icon: const Icon(Icons.cameraswitch),
             onPressed: () {
               cameraController.switchCamera();
             },
@@ -71,7 +71,7 @@ class QRScanner extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          if (scanState.isProcessing) LinearProgressIndicator(),
+          if (scanState.isProcessing) const LinearProgressIndicator(),
           Container(
             height: 300,
             width: double.infinity,
@@ -82,7 +82,7 @@ class QRScanner extends ConsumerWidget {
             ),
           ),
           AnimatedContainer(
-            duration: Duration(milliseconds: 300),
+            duration: const Duration(milliseconds: 300),
             height: studentDetails != null ? 150 : 0,
             curve: Curves.easeInOut,
             child: studentDetails != null
@@ -92,7 +92,7 @@ class QRScanner extends ConsumerWidget {
                       children: [
                         Text(
                           studentDetails['message'] ?? 'No message available',
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),
@@ -106,7 +106,7 @@ class QRScanner extends ConsumerWidget {
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Text('Error: ${scanState.errorMessage}',
-                  style: TextStyle(color: Colors.red)),
+                  style: const TextStyle(color: Colors.red)),
             ),
         ],
       ),

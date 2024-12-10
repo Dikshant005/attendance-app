@@ -32,6 +32,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_riverpod: ^2.6.1
+  fuzzy: ^0.5.1
   http: ^1.2.2
   mobile_scanner: ^6.0.2
 

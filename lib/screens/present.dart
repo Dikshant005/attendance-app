@@ -9,10 +9,10 @@ class PersonListScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Present Persons'),
+        title: const Text('Present Persons'),
       ),
       body: presentstate.isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : presentstate.errorMessage != null
               ? Center(child: Text(presentstate.errorMessage!))
               : ListView.builder(
@@ -32,7 +32,7 @@ class PersonListScreen extends ConsumerWidget {
         onPressed: () {
           ref.read(presentProvider.notifier).fetchpresentPersons();
         },
-        child: Icon(Icons.refresh),
+        child: const Icon(Icons.refresh),
       ),
     );
   }
