@@ -1,28 +1,28 @@
-import 'package:attendance_app/model/person.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:convert';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 
 class QRScanState {
   final bool isProcessing;
   final String? errorMessage;
-  final List<Person> persons;
+  final Map<String, String>? lastScannedData;
 
   QRScanState({
     this.isProcessing = false,
     this.errorMessage,
-    this.persons = const [],
+    this.lastScannedData,
   });
 
   QRScanState copyWith({
     bool? isProcessing,
     String? errorMessage,
-    List<Person>? persons,
+    Map<String, String>? lastScannedData,
   }) {
     return QRScanState(
       isProcessing: isProcessing ?? this.isProcessing,
       errorMessage: errorMessage ?? this.errorMessage,
-      persons: persons ?? this.persons,
+      lastScannedData: lastScannedData ?? this.lastScannedData,
     );
   }
 }
@@ -34,21 +34,26 @@ class QRScanNotifier extends StateNotifier<QRScanState> {
     state = state.copyWith(isProcessing: true);
 
     try {
-      final response = await http.get(
-        Uri.parse('https://your-api-endpoint.com/students/$studentNumber'),
+      final response = await http.post(
+        Uri.parse(
+            'http://brl_registration_12.sugandhi.tech/manual-attendance/'),
+        body: {
+          'student_no': studentNumber,
+        },
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        final person = Person.fromJson(data);
+        final responseBody = jsonDecode(response.body);
+
+        final msg = responseBody['msg'] ?? 'Attendance marking failed';
 
         state = state.copyWith(
-          persons: [...state.persons, person],
           isProcessing: false,
+          lastScannedData: {'message': msg},
         );
       } else {
         state = state.copyWith(
-          errorMessage: 'Failed to load student details',
+          errorMessage: 'Failed to post student number to the API',
           isProcessing: false,
         );
       }

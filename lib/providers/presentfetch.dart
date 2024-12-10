@@ -3,28 +3,28 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class PersonState {
+class presentstate {
   final bool isLoading;
   final List<Person>? persons;
   final String? errorMessage;
 
-  PersonState({
+  presentstate({
     required this.isLoading,
     this.persons,
     this.errorMessage,
   });
 
-  PersonState.initial()
+  presentstate.initial()
       : isLoading = false,
         persons = [],
         errorMessage = null;
 
-  PersonState copyWith({
+  presentstate copyWith({
     bool? isLoading,
     List<Person>? persons,
     String? errorMessage,
   }) {
-    return PersonState(
+    return presentstate(
       isLoading: isLoading ?? this.isLoading,
       persons: persons ?? this.persons,
       errorMessage: errorMessage ?? this.errorMessage,
@@ -32,14 +32,14 @@ class PersonState {
   }
 }
 
-class PersonNotifier extends StateNotifier<PersonState> {
-  PersonNotifier() : super(PersonState.initial());
+class presentnotifier extends StateNotifier<presentstate> {
+  presentnotifier() : super(presentstate.initial());
 
-  Future<void> fetchPersons() async {
+  Future<void> fetchpresentPersons() async {
     state = state.copyWith(isLoading: true);
     try {
       final response = await http
-          .get(Uri.parse('http://brl_registration_12.sugandhi.tech/member'));
+          .get(Uri.parse('http://brl_registration_12.sugandhi.tech/students/'));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
@@ -58,7 +58,7 @@ class PersonNotifier extends StateNotifier<PersonState> {
   }
 }
 
-final personProvider =
-    StateNotifierProvider<PersonNotifier, PersonState>((ref) {
-  return PersonNotifier();
+final presentProvider =
+    StateNotifierProvider<presentnotifier, presentstate>((ref) {
+  return presentnotifier();
 });

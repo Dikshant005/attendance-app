@@ -1,7 +1,7 @@
+import 'package:attendance_app/providers/qr.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
-import 'package:attendance_app/providers/qr.dart';
 
 class QRScanner extends ConsumerWidget {
   final MobileScannerController cameraController = MobileScannerController();
@@ -11,11 +11,15 @@ class QRScanner extends ConsumerWidget {
   void _onDetect(BarcodeCapture barcodeCapture, BuildContext context,
       WidgetRef ref) async {
     for (final barcode in barcodeCapture.barcodes) {
-      final String? code = barcode.rawValue;
+      final code = barcode.rawValue;
       print('Scanned code: $code');
 
       if (code != null && !ref.read(qrScanProvider).isProcessing) {
-        ref.read(qrScanProvider.notifier).scanQRCode(code);
+        final qrData = _parseQRCodeData(code);
+
+        if (qrData != null && qrData['Student No'] != null) {
+          ref.read(qrScanProvider.notifier).scanQRCode(qrData['Student No']!);
+        }
 
         await cameraController.stop();
         await Future.delayed(Duration(seconds: 2));
@@ -25,12 +29,27 @@ class QRScanner extends ConsumerWidget {
     }
   }
 
+  Map<String, String>? _parseQRCodeData(String code) {
+    try {
+      final dataLines = code.split('\n');
+      final data = <String, String>{};
+      for (var line in dataLines) {
+        final keyValue = line.split(':');
+        if (keyValue.length == 2) {
+          data[keyValue[0].trim()] = keyValue[1].trim();
+        }
+      }
+      return data.isNotEmpty ? data : null;
+    } catch (e) {
+      print('Error parsing QR code: $e');
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final scanState = ref.watch(qrScanProvider);
-
-    final fetchedPerson =
-        scanState.persons.isNotEmpty ? scanState.persons.last : null;
+    final studentDetails = scanState.lastScannedData;
 
     return Scaffold(
       appBar: AppBar(
@@ -62,18 +81,27 @@ class QRScanner extends ConsumerWidget {
                   _onDetect(barcodeCapture, context, ref),
             ),
           ),
-          if (fetchedPerson != null) ...[
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Text('Student Details:',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            ),
-            ListTile(
-              title: Text('Name: ${fetchedPerson.name}'),
-              subtitle: Text(
-                  'Student Number: ${fetchedPerson.studentNumber}\nEmail: ${fetchedPerson.email}\nBranch: ${fetchedPerson.branch}'),
-            ),
-          ],
+          AnimatedContainer(
+            duration: Duration(milliseconds: 300),
+            height: studentDetails != null ? 150 : 0,
+            curve: Curves.easeInOut,
+            child: studentDetails != null
+                ? Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      children: [
+                        Text(
+                          studentDetails['message'] ?? 'No message available',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  )
+                : Container(),
+          ),
           if (scanState.errorMessage != null)
             Padding(
               padding: const EdgeInsets.all(16.0),
