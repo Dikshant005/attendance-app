@@ -37,6 +37,9 @@ class QRScanNotifier extends StateNotifier<QRScanState> {
       final response = await http.post(
         Uri.parse(
             'http://brl_registration_12.sugandhi.tech/manual-attendance/'),
+        headers: {
+          'Authorization': 'meradatabase',
+        },
         body: {
           'student_no': studentNumber,
         },
@@ -46,6 +49,7 @@ class QRScanNotifier extends StateNotifier<QRScanState> {
         final responseBody = jsonDecode(response.body);
 
         final msg = responseBody['msg'] ?? 'Attendance marking failed';
+        print('all okay');
 
         state = state.copyWith(
           isProcessing: false,
@@ -53,13 +57,14 @@ class QRScanNotifier extends StateNotifier<QRScanState> {
         );
       } else {
         state = state.copyWith(
-          errorMessage: 'Failed to post student number to the API',
+          errorMessage:
+              'Failed to post student number to the API. Status code: ${response.statusCode}',
           isProcessing: false,
         );
       }
     } catch (e) {
       state = state.copyWith(
-        errorMessage: 'Error: $e',
+        errorMessage: 'An error occurred',
         isProcessing: false,
       );
     }

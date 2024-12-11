@@ -5,28 +5,28 @@ import 'dart:convert';
 
 class presentstate {
   final bool isLoading;
-  final List<Person>? persons;
+  final List<Person>? present;
   final String? errorMessage;
 
   presentstate({
     required this.isLoading,
-    this.persons,
+    this.present,
     this.errorMessage,
   });
 
   presentstate.initial()
-      : isLoading = false,
-        persons = [],
+      : isLoading = true,
+        present = [],
         errorMessage = null;
 
   presentstate copyWith({
     bool? isLoading,
-    List<Person>? persons,
+    List<Person>? present,
     String? errorMessage,
   }) {
     return presentstate(
       isLoading: isLoading ?? this.isLoading,
-      persons: persons ?? this.persons,
+      present: present ?? this.present,
       errorMessage: errorMessage ?? this.errorMessage,
     );
   }
@@ -35,7 +35,7 @@ class presentstate {
 class presentnotifier extends StateNotifier<presentstate> {
   presentnotifier() : super(presentstate.initial());
 
-  Future<void> fetchpresentPersons() async {
+  Future<void> fetchpresentpersons() async {
     state = state.copyWith(isLoading: true);
     try {
       final response = await http
@@ -43,17 +43,18 @@ class presentnotifier extends StateNotifier<presentstate> {
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
-        final List<Person> persons = (jsonData['members'] as List)
+        final List<Person> present = (jsonData['members'] as List)
             .map((data) => Person.fromJson(data))
             .toList();
 
-        state = state.copyWith(persons: persons, isLoading: false);
+        state = state.copyWith(present: present, isLoading: false);
       } else {
         state = state.copyWith(
             errorMessage: 'Failed to load data', isLoading: false);
       }
     } catch (e) {
-      state = state.copyWith(errorMessage: 'Error: $e', isLoading: false);
+      state =
+          state.copyWith(errorMessage: 'Error Showing data', isLoading: false);
     }
   }
 }
