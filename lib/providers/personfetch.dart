@@ -15,7 +15,7 @@ class PersonState {
   });
 
   PersonState.initial()
-      : isLoading = false,
+      : isLoading = true,
         persons = [],
         errorMessage = null;
 
@@ -37,9 +37,14 @@ class PersonNotifier extends StateNotifier<PersonState> {
 
   Future<void> fetchPersons() async {
     state = state.copyWith(isLoading: true);
+
     try {
-      final response = await http
-          .get(Uri.parse('http://brl_registration_12.sugandhi.tech/member'));
+      final response = await http.get(
+        Uri.parse('http://brl_registration_12.sugandhi.tech/member'),
+        headers: {
+          'Authorization': 'meradatabase',
+        },
+      );
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
@@ -53,7 +58,8 @@ class PersonNotifier extends StateNotifier<PersonState> {
             errorMessage: 'Failed to load data', isLoading: false);
       }
     } catch (e) {
-      state = state.copyWith(errorMessage: 'Error: $e', isLoading: false);
+      state =
+          state.copyWith(errorMessage: 'Error Showing data', isLoading: false);
     }
   }
 }

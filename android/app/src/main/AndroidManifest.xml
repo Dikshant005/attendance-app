@@ -4,7 +4,7 @@
 
 
     <application
-        android:label="attendance_app"
+        android:label="Vision"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
